@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -19,13 +20,19 @@ public class ContactService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SocialMediaService socialMediaService;
+
     // Save a new contact for the authenticated user
     public Contact addContactForUser(String userEmail, Contact contact) {
         User user = userService.getUserByEmail(userEmail);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
+        Map<String, String> validSocialLinks = socialMediaService.validateAndGenerateLinks(contact);
+
         contact.setUser(user);
+        contact.setSocialLinks(validSocialLinks);
         return contactRepository.save(contact);
     }
 

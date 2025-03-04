@@ -1,8 +1,11 @@
 package com.ContactVerse.ContactVerse.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +22,7 @@ import java.util.Map;
 public class Contact extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @NotEmpty(message = "Name cannot be empty")
@@ -34,7 +38,8 @@ public class Contact extends BaseModel {
     @CollectionTable(name = "contact_social_links", joinColumns = @JoinColumn(name = "contact_id"))
     @MapKeyColumn(name = "platform")
     @Column(name = "link")
-    private Map<String, String> socialLinks = new HashMap<>();
+    @Valid
+    private Map<String, @Pattern(regexp = "^(http|https)://.*", message = "Invalid URL format") String> socialLinks = new HashMap<>();
 
     private boolean deleted = false;
 

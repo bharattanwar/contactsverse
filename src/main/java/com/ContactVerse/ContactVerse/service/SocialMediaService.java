@@ -1,32 +1,42 @@
 package com.ContactVerse.ContactVerse.service;
 
-import com.ContactVerse.ContactVerse.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ContactVerse.ContactVerse.model.Contact;
 import org.springframework.stereotype.Service;
-import com.ContactVerse.ContactVerse.model.SocialMediaContent;
-import com.ContactVerse.ContactVerse.repository.jpa.SocialMediaContentRepository;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class SocialMediaService {
 
-    @Autowired
-    private SocialMediaContentRepository socialMediaContentRepository;
+    // Validate & auto-generate social media links
+    public Map<String, String> validateAndGenerateLinks(Contact contact) {
+        Map<String, String> validSocialLinks = new HashMap<>();
 
-    public List<SocialMediaContent> getMessages(User user, String platform) {  // Correct: Accepts User
-        return socialMediaContentRepository.findByUserAndPlatform(user, platform);
-    }
+        // Validate and store user-provided links
+        contact.getSocialLinks().forEach((platform, link) -> {
+            if (!isValidUrl(link)) {
+                throw new IllegalArgumentException("Invalid URL format for " + platform);
+            }
+            validSocialLinks.put(platform.toLowerCase(), link);
+        });
 
-    public SocialMediaContent saveContent(SocialMediaContent content) {
-        return socialMediaContentRepository.save(content);
-    }
-
-    public boolean deleteContent(Long contentId) {
-        if (socialMediaContentRepository.existsById(contentId)) {
-            socialMediaContentRepository.deleteById(contentId);
-            return true;
+        // Auto-generate WhatsApp link if missing
+        if (!validSocialLinks.containsKey("whatsapp") && contact.getPhoneNumber() != null) {
+            validSocialLinks.put("whatsapp", generateWhatsAppLink(contact.getPhoneNumber()));
         }
-        return false;
+
+        return validSocialLinks;
+    }
+
+    // Generate a WhatsApp chat link
+    private String generateWhatsAppLink(String phoneNumber) {
+        String cleanedNumber = phoneNumber.replaceAll("[^0-9]", ""); // Remove non-numeric characters
+        return "https://wa.me/" + cleanedNumber;
+    }
+
+    // Validate URL format
+    private boolean isValidUrl(String url) {
+        return url.matches("^(http|https)://.*");
     }
 }
