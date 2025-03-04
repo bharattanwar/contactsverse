@@ -3,6 +3,7 @@ package com.ContactVerse.ContactVerse.config;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -36,9 +37,11 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public boolean validateToken(String token, String email) {
-        return extractEmail(token).equals(email) && !isTokenExpired(token);
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String extractedEmail = extractEmail(token);
+        return extractedEmail.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
 
     private boolean isTokenExpired(String token) {
         return Jwts.parserBuilder()

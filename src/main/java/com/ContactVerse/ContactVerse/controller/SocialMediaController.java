@@ -1,5 +1,6 @@
 package com.ContactVerse.ContactVerse.controller;
 
+import com.ContactVerse.ContactVerse.model.SocialMediaContent;
 import com.ContactVerse.ContactVerse.model.User;
 import com.ContactVerse.ContactVerse.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import com.ContactVerse.ContactVerse.model.SocialMediaContent;
 import com.ContactVerse.ContactVerse.service.SocialMediaService;
 import java.util.List;
 
