@@ -54,4 +54,14 @@ public class ContactController {
                 ? ResponseEntity.ok("Contact deleted successfully")
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact not found");
     }
+
+    @GetMapping("/{contactId}/social-link")
+    public ResponseEntity<String> getSocialMediaLink(
+            @PathVariable Long contactId,
+            @RequestParam String platform) { // Changed to @RequestParam
+        String link = contactService.getSocialMediaLink(contactId, platform);
+        return link != null ? ResponseEntity.ok(link)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Social media link not found for platform: " + platform);
+    }
 }

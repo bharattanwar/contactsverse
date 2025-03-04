@@ -1,5 +1,6 @@
 package com.ContactVerse.ContactVerse.service;
 
+import com.ContactVerse.ContactVerse.exception.ResourceNotFoundException;
 import com.ContactVerse.ContactVerse.model.Contact;
 import com.ContactVerse.ContactVerse.model.User;
 import com.ContactVerse.ContactVerse.repository.jpa.ContactRepository;
@@ -7,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,4 +71,20 @@ public class ContactService {
             return true;
         }).orElse(false);
     }
+
+    public String getSocialMediaLink(Long contactId, String platform) {
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contact not found"));
+
+        // Normalize the key by converting it to lowercase
+        String normalizedPlatform = platform.toLowerCase();
+
+        // Debugging: Print available keys and the searched key
+        System.out.println("Searching for platform: " + normalizedPlatform);
+        System.out.println("Available keys: " + contact.getSocialLinks().keySet());
+
+        return contact.getSocialLinks().getOrDefault(normalizedPlatform, null);
+    }
+
+
 }
