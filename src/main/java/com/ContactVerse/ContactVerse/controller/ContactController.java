@@ -24,37 +24,17 @@ public class ContactController {
     @Autowired
     private ContactService contactService;
 
-    @Autowired
-    private UserService userService;
-
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public Contact addContact(@Valid @RequestBody Contact contact) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-
-        User user = userService.getUserByEmail(userEmail);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found");
-        }
-
-        contact.setUser(user);
-
-        return contactService.saveContact(contact);
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return contactService.addContactForUser(userEmail, contact);
     }
 
     @GetMapping("/user")
     public ResponseEntity<List<Contact>> getContactsByUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-
-        User user = userService.getUserByEmail(userEmail);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<Contact> contacts = contactService.getContactsByUser(user);
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Contact> contacts = contactService.getContactsByUser(userEmail);
         return contacts.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(contacts);
     }
 

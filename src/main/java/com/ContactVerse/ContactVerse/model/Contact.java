@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -30,5 +31,12 @@ public class Contact extends BaseModel {
     private String email;
 
     @ElementCollection
-    private Map<String, String> socialLinks;
+    @CollectionTable(name = "contact_social_links", joinColumns = @JoinColumn(name = "contact_id"))
+    @MapKeyColumn(name = "platform")
+    @Column(name = "link")
+    private Map<String, String> socialLinks = new HashMap<>();
+
+    private boolean deleted = false;
+
+
 }
